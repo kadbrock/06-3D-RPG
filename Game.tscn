@@ -1,16 +1,14 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://Player/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Player/Player.gd" type="Script" id=2]
 [ext_resource path="res://terrain.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Target/Target.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Player/RayCast.gd" type="Script" id=5]
-
-[sub_resource type="CubeMesh" id=1]
-size = Vector3( 100, 0.5, 100 )
-
-[sub_resource type="BoxShape" id=2]
-extents = Vector3( 50, 0.25, 50 )
+[ext_resource path="res://NPC/NPC.tscn" type="PackedScene" id=6]
+[ext_resource path="res://NPC/NPC.gd" type="Script" id=7]
+[ext_resource path="res://UI/Dialogue.gd" type="Script" id=8]
+[ext_resource path="res://UI/UI.gd" type="Script" id=9]
 
 [sub_resource type="SpatialMaterial" id=3]
 albedo_color = Color( 1, 0, 0, 1 )
@@ -25,19 +23,15 @@ material = SubResource( 3 )
 radius = 0.5
 height = 1.0
 
+[sub_resource type="SphereShape" id=5]
+radius = 10.0599
+
 [node name="Game" type="Spatial"]
 
-[node name="Ground" type="StaticBody" parent="."]
-visible = false
-
-[node name="MeshInstance" type="MeshInstance" parent="Ground"]
-mesh = SubResource( 1 )
-
-[node name="CollisionShape" type="CollisionShape" parent="Ground"]
-shape = SubResource( 2 )
-
 [node name="Player" parent="." instance=ExtResource( 1 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.00963223, 0 )
+transform = Transform( 0.290919, 0, -0.956748, 0, 1, 0, 0.956748, 0, 0.290919, 24.4107, -0.297294, -13.6475 )
+collision_layer = 3
+collision_mask = 3
 script = ExtResource( 2 )
 
 [node name="Pivot" type="Position3D" parent="Player"]
@@ -61,6 +55,7 @@ mesh = SubResource( 4 )
 transform = Transform( 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0 )
 
 [node name="Target_Container" type="Spatial" parent="."]
+visible = false
 
 [node name="Target" parent="Target_Container" instance=ExtResource( 4 )]
 transform = Transform( 0.939693, 0, 0.34202, 0, 1, 0, -0.34202, 0, 0.939693, -27, 4, 9 )
@@ -76,3 +71,65 @@ transform = Transform( 0.420276, 0, -0.907397, 0, 1, 0, 0.907397, 0, 0.420276, -
 
 [node name="Target5" parent="Target_Container" instance=ExtResource( 4 )]
 transform = Transform( -0.633003, 0, -0.77415, 0, 1, 0, 0.77415, 0, -0.633003, 29.4702, 6.0322, -44.8169 )
+
+[node name="NPC" parent="." instance=ExtResource( 6 )]
+transform = Transform( -0.389783, 0, 0.920907, 0, 1, 0, -0.920907, 0, -0.389783, 11.9923, 0.117552, -3.64162 )
+script = ExtResource( 7 )
+
+[node name="Area" type="Area" parent="NPC"]
+transform = Transform( 1, 0, 2.98023e-08, 0, 1, 0, -2.98023e-08, 0, 1, 0, 0, 0 )
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape" type="CollisionShape" parent="NPC/Area"]
+shape = SubResource( 5 )
+
+[node name="UI" type="CanvasLayer" parent="."]
+script = ExtResource( 9 )
+
+[node name="Background" type="ColorRect" parent="UI"]
+anchor_right = 1.0
+margin_bottom = 30.0
+color = Color( 0, 0, 0, 0.501961 )
+
+[node name="Score" type="Label" parent="UI"]
+margin_left = 10.0
+margin_right = 510.0
+margin_bottom = 30.0
+text = "Score:"
+valign = 1
+
+[node name="Time" type="Label" parent="UI"]
+margin_left = 502.0
+margin_right = 1002.0
+margin_bottom = 30.0
+text = "Timer: 00:00"
+align = 2
+valign = 1
+
+[node name="Timer" type="Timer" parent="UI"]
+
+[node name="Dialogue" type="Control" parent="UI"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 8 )
+
+[node name="Background" type="ColorRect" parent="UI/Dialogue"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -30.0
+color = Color( 0, 0, 0, 0.501961 )
+
+[node name="Text" type="RichTextLabel" parent="UI/Dialogue"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -20.0
+margin_bottom = 10.0
+bbcode_enabled = true
+
+[connection signal="body_entered" from="NPC/Area" to="NPC" method="_on_Area_body_entered"]
+[connection signal="body_exited" from="NPC/Area" to="NPC" method="_on_Area_body_exited"]
+[connection signal="timeout" from="UI/Timer" to="UI" method="_on_Timer_timeout"]
