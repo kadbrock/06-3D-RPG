@@ -9,7 +9,7 @@ func _ready():
 	hide()
 
 func _physics_process(_delta):
-	if dialogue.size() and dialogue_pos > dialogue.size():
+	if dialogue.size() and dialogue_pos < dialogue.size():
 		var d = "[center]" + dialogue[dialogue_pos] + "[/center]"
 		if $Text.bbcode_text != d:
 			$Text.bbcode_text = d
